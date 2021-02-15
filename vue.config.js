@@ -13,5 +13,9 @@ module.exports = {
   // https://cli.vuejs.org/config/#transpiledependencies
   transpileDependencies: [
     'vuetify'
-  ]
+  ],
+
+  devServer: {
+    disableHostCheck: true,
+  }
 }
