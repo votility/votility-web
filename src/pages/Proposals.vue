@@ -1,0 +1,468 @@
+<template>
+    <div>
+      <v-card
+        color="grey lighten-4"
+        flat
+      >
+        <v-toolbar class="elevation-0">
+          <v-toolbar-title>Proposals</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-menu
+            bottom
+            offset-y
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn 
+                class="ma-2"
+                v-bind="attrs"
+                v-on="on"
+                icon>
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item @click="goToNewProposal()">
+                <v-list-item-icon>
+                  <v-icon >mdi-file-star-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  New Proposal
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="() => {}">
+                <v-list-item-icon>
+                  <v-icon>mdi-filter-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  Filter
+                </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item @click="loadProposals(1)">
+                <v-list-item-icon>
+                  <v-icon>mdi-reload</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  Reload
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-toolbar>
+      </v-card>
+      
+      <v-divider class="my-2"></v-divider>
+      <v-container fluid v-if="loading">
+        <v-row dense>
+          <v-col>
+            <v-skeleton-loader
+            type="list-item-two-line"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="list-item-two-line"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="list-item-two-line"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="list-item-two-line"
+            ></v-skeleton-loader>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid v-else>
+        <v-row dense>
+          <v-col
+            v-for="(stat, i) in stats"
+            :key="i"
+            cols="12"
+            md="6"
+            lg="3"
+          >
+            <v-card class="pa-3 text-center">
+              <div class="overline mb-2">
+                <v-icon :color="stat.color">{{stat.icon}}</v-icon>
+                {{ stat.title }}
+              </div>
+              <div class="text-h4">{{ stat.value }}</div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+      
+      <v-container fluid v-if="loading">
+        <v-row dense>
+          <v-col>
+            <v-skeleton-loader
+            type="card-heading, image, list-item, list-item, actions"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="card-heading, image, list-item, list-item, actions"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="card-heading, image, list-item, list-item, actions"
+            ></v-skeleton-loader>
+          </v-col>
+          <v-col>
+            <v-skeleton-loader
+            type="card-heading, image, list-item, list-item, actions"
+            ></v-skeleton-loader>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid v-else>
+        <v-row dense>
+          <v-col 
+            cols="12" 
+            md="3" 
+            :key="proposal.id" 
+            v-for="proposal in proposals">
+            <v-card>
+              <v-app-bar
+                flat
+              >
+                <v-toolbar-title>
+                  {{ proposal.content.name }}
+                  
+                </v-toolbar-title>
+                <v-chip v-if="proposal.isFinished" x-small color="error" class="font-weight-bold ml-1">Finished</v-chip>
+                <v-spacer></v-spacer>
+                <mark-button :proposalId="proposal.id" />
+                <v-menu offset-y>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      icon
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item @click="goToFinish(proposal.id)">
+                      <v-list-item-icon>
+                        <v-icon>mdi-cards</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        Finish
+                      </v-list-item-content>
+                    </v-list-item>
+
+                    <v-list-item @click="goToHistory(proposal.id)">
+                      <v-list-item-icon>
+                        <v-icon>mdi-history</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        Show History
+                      </v-list-item-content>
+                    </v-list-item>
+
+                    <v-list-item @click="goToProposal(proposal.id)">
+                      <v-list-item-icon>
+                        <v-icon>mdi-share-all</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content>
+                        View
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </v-app-bar>
+              <div class="pa-3">
+                <div class="d-flex align-center flex-column">
+                  <v-avatar small size="120">
+                    <robo-hash-address size="120" :address="proposal.votingOwner" />
+                  </v-avatar>
+                  <div class="text-center mt-2">
+                    <div class="secondary--text text--lighten-1 text-caption">
+                      {{ proposal.tokenInfo.symbol }}
+                    </div>
+                    <div class="secondary--text text--lighten-1 text-caption">
+                      Block Limit: {{ proposal.blockLimit }}
+                    </div>
+                    <v-chip v-if="proposal.blockLimit < currentBlockNumber" x-small color="error" class="font-weight-bold ml-1">Expired</v-chip>
+                    <v-chip v-if="proposal.blockLimit >= currentBlockNumber" x-small color="success" class="font-weight-bold ml-1">Active</v-chip>
+                  </div>
+                  <div class="text-center mt-2">
+                    <div class="secondary--text text--lighten-1 text-caption">
+                      Minimum Quorum: <minimum-quorum :minimumQuorum="proposal.minimumQuorum" />
+                    </div>
+                  </div>
+                </div>
+                <quorum-progress-bar
+                  :minimumQuorum="proposal.minimumQuorum" 
+                  :totalSupply="proposal.tokenInfo.totalSupply"
+                  :weight="proposal.weight"
+                  />
+              </div>
+              <v-divider></v-divider>
+              <div class="d-flex">
+                <v-btn @click="goToProposal(proposal.id)" class="flex-grow-1" tile height="48" text>
+                  <v-icon left>mdi-share-all</v-icon>
+                  View
+                </v-btn>
+                <v-divider vertical></v-divider>
+                <v-btn :disabled="proposal.isFinished || proposal.blockLimit < currentBlockNumber" @click="openVoteDialog(proposal)" class="flex-grow-1" tile height="48" text>
+                  <v-icon left>mdi-vote</v-icon>
+                  Vote
+                </v-btn>
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+      <div class="text-center" v-if="pageCount > 1">
+        <v-container>
+          <v-row justify="center">
+            <v-col cols="8">
+              <v-container class="max-width">
+                <v-pagination
+                  v-model="page"
+                  class="my-4"
+                  :length="pageCount"
+                ></v-pagination>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
+      <vote-dialog :open="voteDialog" :proposal="this.selectedProposal" :content="this.selectedContent" @close="closeVoteDialog" />
+    </div>
+</template>
+
+<script>
+import UserTable from '@/components/examples/UserTable'
+import Card2 from '@/components/ui/application/card/Card2'
+import Card5 from '@/components/ui/application/card/Card5'
+
+import IPFSHelper from '@/lib/helpers/IPFSHelper';
+import VoteDialog from '@/lib/components/ui/Proposal/VoteDialog';
+import VotilityProtocolProxy from '@/lib/eth/VotilityProtocolProxy';
+import ERC20Proxy from '@/lib/eth/ERC20Proxy';
+import RoboHashAddress from '@/lib/components/ui/RoboHashAddress.vue';
+import TokenAmount from '@/lib/components/ui/TokenAmount.vue';
+import TransactionLink from '@/lib/components/ui/TransactionLink.vue';
+import MinimumQuorum from '@/lib/components/ui/Proposal/MinimumQuorum.vue';
+import QuorumProgressBar from '@/lib/components/ui/Proposal/QuorumProgressBar.vue';
+
+import MarkButton from '@/lib/components/ui/MarkButton';
+
+export default {
+  components: {
+    UserTable,
+    Card2,
+    Card5,
+
+    VoteDialog,
+    RoboHashAddress,
+    TokenAmount,
+    TransactionLink,
+    MinimumQuorum,
+    QuorumProgressBar,
+    MarkButton,
+  },
+  
+  data() {
+    return {
+      page: 1, 
+      pageCount: 0,
+      pageSize: 8,
+      proposals: [],
+      voteDialog: false,
+      selectedProposal: {},
+      selectedContent: {},
+
+      currentBlockNumber: 0,
+
+      loading: true,
+
+      stats: [{
+        icon: 'mdi-file-star-outline',
+        color: 'success',
+        title: 'Proposals',
+        value: '0'
+      }, {
+        icon: 'mdi-lock-outline',
+        color: 'grey',
+        title: 'Finished',
+        value: '0'
+      }, {
+        icon: 'mdi-fire',
+        color: 'yellow',
+        title: 'Burnt Tokens',
+        value: '0'
+      }, {
+        icon: 'mdi-vote',
+        color: 'indigo',
+        title: 'Votes',
+        value: '0'
+      }]
+    }
+  },
+
+  computed: {
+    isConnected() {
+      return this.$store.getters['user/isConnected'];
+    },
+
+    account() {
+      return this.$store.getters['user/account'];
+    },
+
+    markedProposals() {
+      return this.$store.getters['user/markedProposals'];
+    },
+  },
+
+  watch: {
+    isConnected() {
+      this.loadData();
+    },
+
+    page() {
+      this.loadProposals();
+    }
+  },
+
+  mounted() {
+    this.loadData();
+  },
+
+  methods: {
+    goToProposal(proposalId) {
+      this.$router.push(`/proposals/${proposalId}`);
+    },
+
+    goToHistory(proposalId) {
+      this.$router.push(`/proposals/${proposalId}/history`);
+    },
+
+    goToFinish(proposalId) {
+      this.$router.push(`/proposals/${proposalId}/finish`);
+    },
+
+    goToNewProposal() {
+      this.$router.push(`/proposals/new`);
+    },
+
+    closeVoteDialog() {
+      this.selectedProposal = {};
+      this.selectedContent = {};
+      this.voteDialog = false;
+    },
+
+    openVoteDialog(proposal) {
+      this.selectedProposal = proposal;
+      this.selectedContent = proposal.content;
+      this.voteDialog = true;
+    },
+
+    async loadData() {
+      if (!this.isConnected) {
+        return;
+      }
+
+      this.loading = true;
+
+      await Promise.all([
+        this.loadCurrentBlockNumber(),
+        this.loadInfo(),
+        this.loadProposals(),
+        this.subscribeToEvents(),
+      ]);
+
+      this.loading = false;
+    },
+
+    async loadCurrentBlockNumber() {
+      if (!this.isConnected) {
+        return;
+      }
+
+      this.currentBlockNumber = await web3.eth.getBlockNumber();
+    },
+
+     async loadInfo() {
+      if (!this.isConnected) {
+        return;
+      }
+
+      const proxy = new VotilityProtocolProxy();
+
+      const info = await proxy.getInfo();
+
+      this.stats[0].value = info.count;
+      this.stats[1].value = info.finished;
+      this.stats[2].value = info.burntTokens;
+      this.stats[3].value = info.votes;
+
+      console.log(info);
+    },
+
+    async loadProposals(page) {
+      if (!this.isConnected) {
+        return;
+      }
+      
+      const proxy = new VotilityProtocolProxy();
+      const count = await proxy.getProposalsCount();
+
+      this.page = page || this.page;
+      this.pageCount = Math.ceil(count / this.pageSize);
+
+      const proposals = await proxy.getProposals(this.pageSize, this.page - 1);
+
+      this.proposals = await Promise.all(proposals.map(async (proposal) => {
+        const erc20Proxy = new ERC20Proxy(proposal.erc20VotingPower);
+
+        return {
+          ...proposal,
+          weight: await proxy.getProposalWeight(proposal.id),
+          tokenInfo: await erc20Proxy.getInfo(this.acount),
+          content: proposal.ipfsData ? JSON.parse(await IPFSHelper.read(proposal.ipfsData)) : {
+            name: 'N/A',
+          }
+        }
+      }));
+      
+      console.log(this.proposals);
+    },
+
+    subscribeToEvents() {
+      // if (!this.isConnected) {
+      //   return;
+      // }
+
+      // const proxy = new VotilityProtocolProxy();
+      // const events = proxy.events();
+
+      // events.NewProposal({fromBlock: 0})
+      // .on('connected', function(subscriptionId){
+      //    console.log({subscriptionId});
+      // })
+      // .on('data', (event) => {
+      //   console.log('data', event);
+      //   this.loadProposals();
+      // })
+      // .on('changed', function(event){
+      //   console.log('changed', event);
+      // })
+      // .on('error', function(error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+      //   console.log({error, receipt});
+      // });
+    }
+  }
+}
+</script>
+
+
