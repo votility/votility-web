@@ -93,7 +93,7 @@ export default {
         title: `Proposal finished #${event.returnValues.proposalId}`,
         color: 'info',
         icon: 'mdi-file-star-outline',
-        subtitle: `A proposal has been finished by ${event.returnValues.finished}`,
+        subtitle: `A proposal has been finished by ${event.returnValues.finisher}`,
         time: `Block #${event.blockNumber}`
       });
     },
