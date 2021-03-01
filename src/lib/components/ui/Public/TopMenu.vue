@@ -75,7 +75,7 @@ export default {
 
   methods: {
     goToApp() {
-      this.$router.push('/proposals');
+      this.$router.push('/');
     },
   }
 }

@@ -8,7 +8,7 @@
       tile
     >
       <div class="d-flex flex-grow-1 align-center">
-        <router-link to="/proposals" class="d-flex px-1 align-center logo">
+        <router-link to="/" class="d-flex px-1 align-center logo">
           <img src="/images/project/logo-small.png" height="56" alt="logo" class="mr-1">
           <div>
             <div class="title font-weight-bold text-uppercase primary--text">Votility</div>
