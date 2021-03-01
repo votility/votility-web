@@ -70,6 +70,8 @@
                         type="number"
                         :hint="blockLimitHint"
                         prefix="#"
+                        append-icon="mdi-content-copy"
+                        @click:append="copyCurrentBlock"
                         autocomplete="off"
                       >
                       </v-text-field>
@@ -362,6 +364,7 @@ export default {
         page: '',
         options: [],
         data: [],
+        blockLimit: '',
       },
       menu,
       config,
@@ -504,6 +507,10 @@ export default {
         }
         this.tokenDialog = true;
       }
+    },
+
+    copyCurrentBlock() {
+      this.entity.blockLimit = parseInt(this.currentBlockNumber);
     },
 
     closeTokenDialog() {
