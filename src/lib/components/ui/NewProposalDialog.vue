@@ -75,6 +75,14 @@
                   </td>
                 </tr>
                 <tr>
+                  <td>Block Limit</td>
+                  <td>
+                    <div>
+                      {{ parsedProposal.blockLimit }}
+                    </div>
+                  </td>
+                </tr>
+                <tr>
                   <td>Minimum Quorum</td>
                   <td>{{ proposal.displayMinimumQuorum }}</td>
                 </tr>
