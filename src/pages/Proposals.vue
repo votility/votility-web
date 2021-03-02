@@ -241,10 +241,6 @@
 </template>
 
 <script>
-import UserTable from '@/components/examples/UserTable'
-import Card2 from '@/components/ui/application/card/Card2'
-import Card5 from '@/components/ui/application/card/Card5'
-
 import IPFSHelper from '@/lib/helpers/IPFSHelper';
 import VoteDialog from '@/lib/components/ui/Proposal/VoteDialog';
 import VotilityProtocolProxy from '@/lib/eth/VotilityProtocolProxy';
@@ -259,10 +255,6 @@ import MarkButton from '@/lib/components/ui/MarkButton';
 
 export default {
   components: {
-    UserTable,
-    Card2,
-    Card5,
-
     VoteDialog,
     RoboHashAddress,
     TokenAmount,
@@ -374,14 +366,18 @@ export default {
 
       this.loading = true;
 
-      await Promise.all([
-        this.loadCurrentBlockNumber(),
-        this.loadInfo(),
-        this.loadProposals(),
-        this.subscribeToEvents(),
-      ]);
+      try {
+        await Promise.all([
+          this.loadCurrentBlockNumber(),
+          this.loadInfo(),
+          this.loadProposals(),
+          this.subscribeToEvents(),
+        ]);
+      } catch (e) {
+      } finally {
+        this.loading = false;
+      }
 
-      this.loading = false;
     },
 
     async loadCurrentBlockNumber() {
@@ -422,18 +418,22 @@ export default {
 
       const proposals = await proxy.getProposals(this.pageSize, this.page - 1);
 
-      this.proposals = await Promise.all(proposals.map(async (proposal) => {
-        const erc20Proxy = new ERC20Proxy(proposal.erc20VotingPower);
+      try {
+        this.proposals = await Promise.all(proposals.map(async (proposal) => {
+          const erc20Proxy = new ERC20Proxy(proposal.erc20VotingPower);
 
-        return {
-          ...proposal,
-          weight: await proxy.getProposalWeight(proposal.id),
-          tokenInfo: await erc20Proxy.getInfo(this.acount),
-          content: proposal.ipfsData ? JSON.parse(await IPFSHelper.read(proposal.ipfsData)) : {
-            name: 'N/A',
+          return {
+            ...proposal,
+            weight: await proxy.getProposalWeight(proposal.id),
+            tokenInfo: await erc20Proxy.getInfo(this.acount),
+            content: proposal.ipfsData ? JSON.parse(await IPFSHelper.read(proposal.ipfsData)) : {
+              name: 'N/A',
+            }
           }
-        }
-      }));
+        }));
+      } catch (e) {
+        alert(e);
+      }
       
       console.log(this.proposals);
     },

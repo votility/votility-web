@@ -320,11 +320,6 @@
 
 <script>
 import config from '@/configs'
-import MainMenu from '@/components/navigation/MainMenu'
-import menu from '@/components/ui/application/layout/menu'
-import UserTable from '@/components/examples/UserTable'
-import Card2 from '@/components/ui/application/card/Card2'
-import Card5 from '@/components/ui/application/card/Card5'
 
 import 'codemirror/lib/codemirror.css';
 import '@toast-ui/editor/dist/toastui-editor.css';
@@ -340,10 +335,6 @@ import { Decimal } from 'decimal.js';
 
 export default {
   components: {
-    MainMenu,
-    UserTable,
-    Card2,
-    Card5,
     Editor,
     NewProposalDialog,
     TokenDialog,
@@ -366,7 +357,6 @@ export default {
         data: [],
         blockLimit: '',
       },
-      menu,
       config,
       drawer: null,
       isContentBoxed: false,
