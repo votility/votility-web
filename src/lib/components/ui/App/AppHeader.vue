@@ -50,7 +50,6 @@ export default {
 
   methods: {
     toggleNetworkInfo(open) {
-      alert(open)
       this.networkInfoModalOpen = open;
     },
 
