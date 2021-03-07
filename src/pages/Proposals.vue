@@ -401,8 +401,6 @@ export default {
       this.stats[1].value = info.finished;
       this.stats[2].value = info.burntTokens;
       this.stats[3].value = info.votes;
-
-      console.log(info);
     },
 
     async loadProposals(page) {
@@ -434,8 +432,6 @@ export default {
       } catch (e) {
         alert(e);
       }
-      
-      console.log(this.proposals);
     },
 
     subscribeToEvents() {

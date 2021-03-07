@@ -110,7 +110,6 @@ export default {
     },
 
     parseNewEvent(event) {
-      console.log(event);
       if (event.event === 'NewProposal') this.parseNewProposalEvent(event);
       if (event.event === 'NewVote') this.parseNewVoteEvent(event);
       if (event.event === 'ProposalFinished') this.parseProposalFinishedEvent(event);
