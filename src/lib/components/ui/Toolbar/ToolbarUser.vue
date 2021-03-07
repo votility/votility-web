@@ -51,22 +51,27 @@
           <v-list-item-title>Go to website</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-divider></v-divider>
+      <v-list-item
+        link
+        @click="openNetworkInfoModal"
+      >
+        <v-list-item-icon>
+          <v-icon small>mdi-cogs</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Network Info</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
+
+    
   </v-menu>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      menu: [
-        { icon: 'mdi-account-box-outline', text: 'Profile' },
-        { icon: 'mdi-cog-outline', text: 'Settings' },
-        { icon: 'mdi-chat-outline', text: 'Chat' }
-      ]
-    }
-  },
 
+export default {
   computed: {
     isConnected() {
       return this.$store.getters['user/isConnected'];
@@ -86,6 +91,10 @@ export default {
 
     goToWebSite() {
       this.$router.push('/');
+    },
+
+    openNetworkInfoModal() {
+      this.$emit('toggleNetworkInfo', true);
     }
   }
 }

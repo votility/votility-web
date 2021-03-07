@@ -1,9 +1,10 @@
 import VotilityProtocol from './VotilityProtocol.json';
-import { VOTILITY_PROTOCOL_SMC_ADDRESS } from '@/lib/Config';
+import store from '@/store';
 
 export default class VotilityProtocolProxy {
-	constructor() {
-		this.smc = new window.web3.eth.Contract(VotilityProtocol.abi, VOTILITY_PROTOCOL_SMC_ADDRESS);
+  constructor() {
+    this.contractAddress = store.getters['user/contractAddress'];
+		this.smc = new window.web3.eth.Contract(VotilityProtocol.abi, this.contractAddress);
 	}
 
 	async getProposal(proposalId) {
@@ -129,7 +130,7 @@ export default class VotilityProtocolProxy {
 	}, account) {
 		const from = account;
 		const nonce = window.web3.utils.toHex(await window.web3.eth.getTransactionCount(account));
-		const to = VOTILITY_PROTOCOL_SMC_ADDRESS;
+		const to = this.contractAddress;
 
 		console.log({
 			data,
@@ -175,7 +176,7 @@ export default class VotilityProtocolProxy {
 	async vote({proposalId, option}, account) {
 		const from = account;
 		const nonce = window.web3.utils.toHex(await window.web3.eth.getTransactionCount(account));
-		const to = VOTILITY_PROTOCOL_SMC_ADDRESS;
+		const to = this.contractAddress;
 		
 		const data = this.smc.methods.vote(
 			proposalId,
@@ -204,7 +205,7 @@ export default class VotilityProtocolProxy {
 	async finish(proposalId, account) {
 		const from = account;
 		const nonce = window.web3.utils.toHex(await window.web3.eth.getTransactionCount(account));
-		const to = VOTILITY_PROTOCOL_SMC_ADDRESS;
+		const to = this.contractAddress;
 		
 		const data = this.smc.methods.finish(proposalId).encodeABI();
 

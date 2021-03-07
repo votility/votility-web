@@ -1,5 +1,3 @@
-import { uniqueId } from "lodash";
-
 import Vue from 'vue';
 
 export default {
@@ -9,6 +7,14 @@ export default {
   
   setIsConnected: (state, isConnected) => {
     state.isConnected = isConnected;
+  },
+
+  setNetworkInfo: (state, networkInfo) => {
+    state.networkInfo = networkInfo;
+  },
+
+  setContractAddress: (state, contractAddress) => {
+    state.contractAddress = contractAddress;
   },
   
   markProposal: (state, { proposalId, marked }) => {

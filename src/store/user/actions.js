@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import Config from '@/lib/Config';
 
 export default {
   disconnectFromMetaMask({ commit }) {
@@ -11,12 +12,31 @@ export default {
   },
 
   async connectToMetaMask({ commit }) {
+    const configure = async ({ commit }) => {
+      const accounts = await window.ethereum.enable();
+      const networkInfo = {
+        id: await web3.eth.net.getId(),
+        type: await web3.eth.net.getNetworkType(),
+      };
+  
+      commit('setIsConnected', true);
+      commit('setAccount', accounts[0]);
+      commit('setNetworkInfo', networkInfo);
+      commit('setContractAddress', Config.getSmartContractAddress(networkInfo.id))
+    };
+  
+    const clear = ({ commit }) => {
+      commit('setIsConnected', false);
+      commit('setAccount', null);
+      commit('setNetworkInfo', {});
+      commit('setContractAddress', '');
+    };
+
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
 
       window.ethereum.on('accountsChanged', (accounts) => {
-        commit('setIsConnected', true);
-        commit('setAccount', accounts[0])
+        configure({commit});
       });
       
       window.ethereum.on('networkChanged', (networkId) => {
@@ -24,13 +44,11 @@ export default {
       });
 
       ethereum.on('disconnect', () => {
-        commit('setIsConnected', false);
-        commit('setAccount', null);
+        clear({commit});
       });
       
       try {
-        const accounts = await window.ethereum.enable();
-
+        configure({commit});        
         // await window.ethereum.request({
         //   method: "wallet_requestPermissions",
         //   params: [
@@ -38,17 +56,11 @@ export default {
         //       eth_accounts: {}
         //     }
         //   ]
-        // });
-        
-        commit('setIsConnected', true);
-        commit('setAccount', accounts[0]);
       } catch (e) {
-        commit('setIsConnected', false);
-        commit('setAccount', '');
+        clear({commit});
       }
     } else {
-      commit('setIsConnected', false);
-      commit('setAccount', '');
+      clear({commit});
     }
   },
 }

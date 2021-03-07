@@ -22,20 +22,41 @@
           <toolbar-notifications />
         </div>
 
-        <toolbar-user />
+        <toolbar-user @toggleNetworkInfo="toggleNetworkInfo" />
       </div>
     </v-card>
+
+    <network-info-modal :open="networkInfoModalOpen" @close="closeNetworkInfoModal" />
   </v-app-bar>
 </template>
 
 <script>
 import ToolbarNotifications from '@/lib/components/ui/Toolbar/ToolbarNotifications';
 import ToolbarUser from '@/lib/components/ui/Toolbar/ToolbarUser';
+import NetworkInfoModal from '@/lib/components/ui/Modals/NetworkInfoModal.vue';
 
 export default {
   components: {
     ToolbarUser,
-    ToolbarNotifications
+    ToolbarNotifications,
+    NetworkInfoModal,
+  },
+
+  data () {
+    return {
+      networkInfoModalOpen: false,
+    }
+  },
+
+  methods: {
+    toggleNetworkInfo(open) {
+      alert(open)
+      this.networkInfoModalOpen = open;
+    },
+
+    closeNetworkInfoModal() {
+      this.networkInfoModalOpen = false;
+    }
   },
 }
 </script>

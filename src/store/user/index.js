@@ -8,6 +8,8 @@ const state = {
   isConnected: false,
   account: '',
   markedProposals: markedProposals ? JSON.parse(markedProposals) : {},
+  networkInfo: {},
+  contractAddress: '',
 }
 
 export default {
